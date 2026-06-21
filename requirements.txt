@@ -1,0 +1,32 @@
+# PSYCHO-Py800MCP requirements
+
+# GUI
+PyQt6>=6.6.0
+
+# MCP サーバー
+fastmcp>=0.4.0
+
+# SCPI / 計測器通信
+pyvisa>=1.14.0
+pyvisa-py>=0.7.0  # NI-VISA不要のpure Python実装
+
+# 波形処理
+numpy>=1.26.0
+scipy>=1.12.0
+
+# 波形保存
+h5py>=3.10.0
+
+# 画像処理（WebCam・顕微鏡）
+opencv-python>=4.9.0
+
+# KiCad連携（オプション、Season 2）
+# skidl>=1.2.0
+
+# 音声（eSpeak NGはシステムインストール）
+# pip install py-espeak-ng  # or subprocess で espeak-ng CLI を叩く
+
+# 開発・テスト
+pytest>=8.0.0
+black>=24.0.0
+ruff>=0.3.0
