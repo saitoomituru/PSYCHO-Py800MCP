@@ -1,5 +1,7 @@
 # gestalt_spec.md — ゲシュタルト係数仕様
 
+状態: `[NEEDS-REVISION]` — 重みと閾値は再設計前。実装へ転記しない。
+
 ---
 
 ## 概念
@@ -19,13 +21,17 @@ PSYCHO-PASSの「犯罪係数」に対応する、
 ゲシュタルト係数 =
     voltage_unknown      × 40   # 電位が不明
   + gnd_not_isolated     × 80   # GNDアイソレート未確認
-  + voltage_over_50v     × 100  # 推定電圧 > 50V（低電圧指令準拠）
+  + voltage_over_50v     × 100  # 旧暫定値。AC/DC・実効値・絶対値を含め再設計する
   + confidence_low       × 60   # スケマティック信頼度 < 0.5
   + adjacent_net_risk    × 30   # 隣接ネットに高リスクネットあり
   + protocol_unanalyzed  × 20   # デジタルプロトコル未解析
 
-最大値: 500
+旧文書上の表記最大値: 500
 ```
+
+現行の真偽値重みをすべて足しても330であり、400以上のcriticalへ到達できない。
+また、`unknown`を単なる加点として扱う設計は廃止し、独立したfail-closedゲートへ移す。
+Phase 0でモデルを再設計するまで、この計算式を実装しない。
 
 ---
 

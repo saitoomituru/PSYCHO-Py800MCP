@@ -1,6 +1,11 @@
 # interface_spec.md — レイヤー間インターフェース仕様
 
-MCPツール定義の正本。実装者はこのファイルに従うこと。
+状態: `[NEEDS-REVISION]` — 初期設計資料。現行の実装正本ではない。
+
+この文書のMCPツール候補は、ApprovalSession、実行環境境界、Phase/Season分離より前に作成された。
+[`implementation_plan.md`](implementation_plan.md)と
+[`architecture/runtime-boundaries.md`](architecture/runtime-boundaries.md)に従って再設計するまで、
+SCPI実装の入力仕様として使用しない。
 
 ---
 
