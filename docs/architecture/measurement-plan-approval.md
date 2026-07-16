@@ -252,6 +252,10 @@ Claim Boundaryを正規化して提示する。
 承認粒度は規格名だけで固定せず、ユーザー指示、物理リスク、操作能力、計画変更可能性から
 MeasurementPlanごとに決める。最低限、次の階層を提示する。
 
+なお、本節はApprovalSession／GUI実装後の運用契約である。Season 0最初の既知IP・`*IDN?`は、
+完全固定のBootstrapRunbookを人間が明示起動する実装試験として分離する。BootstrapRunbookは
+MeasurementPlan承認を代替せず、物理構成、DUT、レンジ、probe設定、装置状態を変更できない。
+
 ### Plan承認
 
 全測定で必須。plan hash、SourceBundle hash、instrument capability snapshot、TTL、AbortPlanへ承認する。
@@ -270,6 +274,10 @@ MeasurementPlanごとに決める。最低限、次の階層を提示する。
 - RUN/STOP、出力、トリガー等、装置状態を変更する
 - 規格要求または機器能力が`UNKNOWN`
 - ユーザーがstep承認を要求した
+
+特にADC保護に関わる電圧上限、probe倍率、入力インピーダンス、AC/DC結合、接地は、AIの推測値だけで
+実行可能状態へ移さない。機器・probeの入力定格、想定最大電圧と過渡、接続点、GND基準をユーザーが
+確認できない場合は`UNKNOWN`として停止する。
 
 ### Query-only承認
 

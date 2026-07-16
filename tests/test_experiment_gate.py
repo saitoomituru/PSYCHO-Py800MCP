@@ -32,7 +32,7 @@ class ExperimentGateTest(unittest.TestCase):
         self.assertFalse(status.instrument_io_allowed)
 
     def test_instrument_io_is_rejected(self) -> None:
-        """ApprovalSession未確立時の実機I/O要求を拒否する。"""
+        """bootstrap runbook未起動時の実機I/O要求を拒否する。"""
 
         with self.assertRaises(GateClosedError):
             require_instrument_io()

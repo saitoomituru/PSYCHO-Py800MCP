@@ -178,6 +178,16 @@ Phaseは責任境界・検証契約の成熟度、Seasonは手持ち実機から
 Python 3.11のネゴシエーション層とプレゼンテーション層を別venvへ作る。Phase 0では
 第三者依存、FastMCP、描画ライブラリ、SCPI通信を起動せず、実験ゲートが閉じていることだけを検証する。
 
+承認機構は危険度に合わせて段階導入する。最初の固定IP・query-only識別実験は、まだ存在しない
+ApprovalSessionを前提にせず、人間が送信先、送信byte、回数、timeout、中止条件を固定したrunbookを
+明示起動し、その記録を残す。AIによるプローブ位置の指示、DUT接続、入力レンジ・probe倍率・結合・
+入力インピーダンスの決定、出力や装置状態の変更へ進む前には、機械的なApprovalSessionを必須にする。
+現在の閉じた実験ゲートは、そのbootstrap実験実装が入るまで維持する。
+
+> **en-US guardrail:** The first known-target, query-only identification run may use a human-started,
+> immutable bootstrap runbook before ApprovalSession exists. This exception never permits AI-directed
+> probing, DUT connection, input-range decisions, state changes, or autonomous retries.
+
 ### Season 3の測定計画GUI
 
 将来のGUIでは、企画原本・規格原本・要求項目をユーザーがローカル環境へ投入する。システムは

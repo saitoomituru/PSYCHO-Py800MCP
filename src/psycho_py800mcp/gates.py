@@ -34,7 +34,7 @@ def current_gate_status() -> GateStatus:
         season="season_0_preflight",
         experiment_gate="closed",
         instrument_io_allowed=False,
-        reason="query-only ApprovalSession has not been explicitly opened",
+        reason="bootstrap query-only runbook has not been explicitly started",
     )
 
 

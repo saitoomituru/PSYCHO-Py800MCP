@@ -33,10 +33,12 @@ Run ID: `<run-id>`
 - coupling / impedance / bandwidth limit:
 - grounding:
 
-## ApprovalSession
+## 実行権限
 
-- 許可対象:
-- 許可コマンド:
+- authority type（BootstrapRunbook / ApprovalSession）:
+- runbook / plan hash:
+- 人間の明示起動・承認記録:
+- 許可対象・完全一致byte／コマンド:
 - 上限:
 - TTL:
 - 解除・中止条件:
