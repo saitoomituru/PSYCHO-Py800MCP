@@ -5,30 +5,28 @@ AGENTS.md を読むこと。以下は Claude Code 向けの補足。
 ## 最初にやること
 
 ```bash
-# 環境確認
-python3 --version        # 3.11+
-pip show PyQt6 fastmcp pyvisa numpy scipy h5py
+# Phase 0の分離runtimeを作成
+./scripts/bootstrap_runtime_envs.sh
 
-# 不足があれば
-pip install PyQt6 fastmcp pyvisa pyvisa-py numpy scipy h5py
+# 実験ゲートが閉じていることを検証
+./scripts/verify_pre_experiment.sh
 ```
 
-## SIGLENT接続確認
+依存をグローバルPythonへ直接インストールしない。ネゴシエーション層とプレゼンテーション層は
+別venvを使い、数理解析はPhase 1以降のDockerサンドボックス候補として扱う。
+
+## SIGLENT接続確認（別の明示承認後）
 
 ```python
-import socket
-s = socket.socket()
-s.settimeout(3)
-s.connect(('192.168.x.x', 5025))  # IPは config.json 参照
-s.send(b'*IDN?\n')
-print(s.recv(1024))
+# Phase 0では実行しない。
+# query-only ApprovalSessionと実験ノートを確立してから実装する。
 ```
 
 ## 作業開始前
 
 1. `notes/` の最新ログを確認
-2. `docs/interface_spec.md` でMCPツール仕様を確認
-3. `src/engine/gestalt.py` の係数定義を確認
+2. `docs/implementation_plan.md` の実験開始ゲートを確認
+3. `docs/architecture/runtime-boundaries.md` のruntime境界を確認
 
 ## 作業終了前
 

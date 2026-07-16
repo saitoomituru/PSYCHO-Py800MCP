@@ -1,0 +1,9 @@
+* text=auto eol=lf
+*.bin binary
+*.h5 binary
+*.hdf5 binary
+*.sqlite binary
+*.sqlite3 binary
+*.png binary
+*.jpg binary
+*.jpeg binary

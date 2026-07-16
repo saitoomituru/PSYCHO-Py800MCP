@@ -1,0 +1,9 @@
+[project]
+name = "psycho-py800mcp-negotiation-runtime"
+version = "0.0.0"
+description = "PSYCHO-Py800MCP negotiation controller runtime"
+requires-python = ">=3.11,<3.13"
+dependencies = []
+
+[tool.uv]
+package = false

@@ -168,6 +168,16 @@ Phaseは責任境界・検証契約の成熟度、Seasonは手持ち実機から
 他社・他機種は寄贈または検証機材の提供を受けた範囲で順次対応する。対応表では
 「設計済み」「実装済み」「実機確認済み」を別々に記録する。
 
+### 実験前runtime
+
+```bash
+./scripts/bootstrap_runtime_envs.sh
+./scripts/verify_pre_experiment.sh
+```
+
+Python 3.11のネゴシエーション層とプレゼンテーション層を別venvへ作る。Phase 0では
+第三者依存、FastMCP、描画ライブラリ、SCPI通信を起動せず、実験ゲートが閉じていることだけを検証する。
+
 ---
 
 ## ディレクトリ構成
