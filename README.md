@@ -178,6 +178,25 @@ Phaseは責任境界・検証契約の成熟度、Seasonは手持ち実機から
 Python 3.11のネゴシエーション層とプレゼンテーション層を別venvへ作る。Phase 0では
 第三者依存、FastMCP、描画ライブラリ、SCPI通信を起動せず、実験ゲートが閉じていることだけを検証する。
 
+### Season 3の測定計画GUI
+
+将来のGUIでは、企画原本・規格原本・要求項目をユーザーがローカル環境へ投入する。システムは
+規格本文を自動取得せず、公式メタデータで版・状態・発行者・更新有無を照合し、利用を許可された
+要求項目から数理層とMeasurementPlanを構築する。本プロジェクト自体の規格認証を目的にせず、
+適用規格と正式な適合性判断はユーザーまたは必要な専門家へ返す。
+
+GUIにはユーザー環境内の「測量規格書投入フォルダー」を用意する。投入原本は外部送信せず、
+read-onlyでhash固定し、ネットワークとscript実行を持たないローカルパーサーで読む。フォルダーへの
+投入は測定承認ではない。抽出された要求項目とMeasurementPlanを別画面で承認するまで実機操作しない。
+
+plan hashへのユーザー承認がなければ測定を開始しない。途中中止時は新規操作を止め、事前承認済みの
+安全停止、取得済みデータの部分確定、MCPホスト向けread-only成果物面へ縮退する。規格の新版を
+検出しても承認済み計画を黙って変更せず、新しい計画として再承認を要求する。
+
+> **en-US guardrail:** User-supplied source material, verified standards metadata, and user-authorized requirements may inform a measurement
+> plan, but this project does not issue certification. A standards update requires a new plan and new
+> approval. User cancellation blocks new instrument actions and finalizes only the data already obtained.
+
 ---
 
 ## ディレクトリ構成

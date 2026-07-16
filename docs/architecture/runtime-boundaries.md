@@ -11,6 +11,9 @@ AI / MCP client
 Negotiation Controller venv
   - MCP service
   - ApprovalSession
+  - MeasurementPlan / AbortPlan
+  - Measurement Source Inbox metadata
+  - Standards source provenance
   - Instrument transport
   - RunManifest / ArtifactStore
       |
@@ -48,6 +51,22 @@ Negotiation Controller venv
 - CPU、メモリ、実行時間を制限
 - image digest、lockfile、コマンド、終了状態をRunManifestへ記録
 - timeout、OOM、parser errorを成功扱いしない
+- 利用許諾を確認できない規格本文を入力しない
+- 入力した要求項目のsource ID、版、hash、許諾区分を出力へ残す
+
+## 規格書パーサーの将来契約
+
+GUIが用意するローカルのMeasurement Source Inboxだけを入力面にする。規格書原本はread-onlyで開き、
+hash固定後、ネットワークなし・macro／script実行なしのパーサーサンドボックスへ渡す。OCRや抽出結果は
+派生成果物として原本artifact IDへ結び付ける。投入フォルダーをリポジトリやMCPホストへ公開しない。
+
+## GUIの将来契約
+
+GUIはSeason 3で、測定計画、出典、規格版、観測不能項目、送信予定コマンド、承認粒度、TTL、
+AbortPlanを人間へ提示する。plan hashへの明示承認前は測定を開始しない。
+
+GUI中止後、ネゴシエーション層は新規操作を拒否し、事前承認済みの縮退操作と部分成果物の確定へ
+移る。read-onlyのMCP成果物面は維持するが、読取要求を実機操作権限へ昇格させない。
 
 ## IPC
 
