@@ -4,7 +4,7 @@
 PyQt6>=6.6.0
 
 # MCP サーバー
-fastmcp>=0.4.0
+fastmcp==3.0.0
 
 # SCPI / 計測器通信
 pyvisa>=1.14.0

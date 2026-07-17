@@ -276,6 +276,8 @@ mDNS/DNS-SD、exact IP、VXI-11、subnet probeの探索順序、identityとendpo
 
 #### S0-C: MCPとReplay
 
+- `list_help_topics` `[IMPLEMENTED: docs-only]`
+- `get_help` `[IMPLEMENTED: docs-only]`
 - `discover_instruments`
 - `identify_instrument`
 - `capture_raw`
@@ -285,6 +287,8 @@ mDNS/DNS-SD、exact IP、VXI-11、subnet probeの探索順序、identityとendpo
 - `render_waveform_preview`
 
 生データ全体をLLMへ返さない。パスを受け取らずrun IDとartifact IDで参照し、読み出し量を制限する。
+最初のMCP protocol試験はHELP文書とFAM flowだけを返すin-memory clientで行い、instrument authorityを
+同じserverへ持ち込まない。docs-only MCPの成功を実機MCPの成功として記録しない。
 
 #### S0-D: USB計測器探索
 

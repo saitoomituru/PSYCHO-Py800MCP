@@ -1,0 +1,218 @@
+{
+  "profile_id": "psycho:help:oscilloscope-field-guide:v1",
+  "profile_status": "designed",
+  "fam_lineage": "FAMoverMCP_toy_model",
+  "fold_signature": "ψ -> ∇φ -> λ -> Q",
+  "execution_bounds": {
+    "max_depth": 4,
+    "unknown_is_not_pass": true,
+    "stop_conditions": [
+      "user_rejected",
+      "engineering_gate_blocked",
+      "anomaly_contract_hit",
+      "elemental_retry_budget_exhausted",
+      "bottom_returned"
+    ]
+  },
+  "root": {
+    "node_id": "fam:psycho:help:root",
+    "parent_id": null,
+    "depends_on": [],
+    "ψ": {
+      "inputs": [
+        "user_measurement_request",
+        "current_instrument_state",
+        "existing_artifacts",
+        "measurement_plan",
+        "engineer_probing_declaration"
+      ]
+    },
+    "∇φ": {
+      "routing_order": [
+        "classify_action_origin",
+        "classify_read_or_write",
+        "validate_physical_exposure",
+        "validate_shared_reference",
+        "request_user_decision",
+        "route_runtime_or_rejection",
+        "finalize_evidence"
+      ]
+    },
+    "λ": {
+      "outputs": [
+        "help_bundle",
+        "measurement_plan",
+        "parent_patch_proposal",
+        "block_response",
+        "artifact_handoff"
+      ]
+    },
+    "Q": {
+      "required_sources": [
+        "project_local_contract",
+        "instrument_or_probe_rating",
+        "engineer_observation",
+        "user_decision"
+      ],
+      "status": "validated_in_context",
+      "safety_gate": "instrument_write_remains_separate",
+      "audit": [
+        "source_ids",
+        "plan_hash",
+        "decision_trace",
+        "artifact_hashes"
+      ]
+    },
+    "sensor_state": {
+      "distinguish": [
+        "observed",
+        "not_observed",
+        "unknown"
+      ]
+    },
+    "children": [
+      {
+        "node_id": "fam:psycho:help:read-existing",
+        "parent_id": "fam:psycho:help:root",
+        "depends_on": [],
+        "ψ": {
+          "condition": "human_established_waveform_exists"
+        },
+        "∇φ": {
+          "route": "read_and_analyze_without_measurement_start_approval"
+        },
+        "λ": {
+          "allowed": [
+            "READ_EXISTING",
+            "ANALYZE_STORED",
+            "RENDER_PREVIEW"
+          ]
+        },
+        "Q": {
+          "status": "validated_in_context",
+          "constraint": "unknown_probing_facts_propagate_to_provenance"
+        }
+      },
+      {
+        "node_id": "fam:psycho:help:planned-write",
+        "parent_id": "fam:psycho:help:root",
+        "depends_on": [],
+        "ψ": {
+          "condition": "ai_originated_instrument_write_requested"
+        },
+        "∇φ": {
+          "route": "measurement_plan_and_bounded_envelopes"
+        },
+        "λ": {
+          "required": [
+            "ChannelExposureContract",
+            "SharedReferenceContract",
+            "EngineerProbingDeclaration",
+            "AnomalyContract",
+            "user_approval"
+          ]
+        },
+        "Q": {
+          "status": "untested",
+          "on_missing": "ENGINEERING_GATE_BLOCK"
+        }
+      },
+      {
+        "node_id": "fam:psycho:help:astral-rejection",
+        "parent_id": "fam:psycho:help:root",
+        "depends_on": [
+          "fam:psycho:help:planned-write"
+        ],
+        "ψ": {
+          "condition": "user_rejected_plan"
+        },
+        "∇φ": {
+          "layer": "astral",
+          "meaning": "purpose_to_plan_connection_protocol_not_established"
+        },
+        "λ": {
+          "status": "REJECTED_FOR_REPLAN",
+          "allowed": [
+            "READ_EXISTING",
+            "ANALYZE_STORED",
+            "REVISE_PLAN"
+          ],
+          "blocked": [
+            "instrument_write",
+            "reuse_old_approval"
+          ]
+        },
+        "Q": {
+          "status": "patch_pending",
+          "patch_proposal": {
+            "target_parent": "fam:psycho:help:planned-write",
+            "operation": "revise_parent_plan",
+            "preserve": [
+              "reject_reason",
+              "user_comment",
+              "engineer_questions"
+            ],
+            "require_new_plan_hash": true
+          }
+        }
+      },
+      {
+        "node_id": "fam:psycho:help:elemental-runtime",
+        "parent_id": "fam:psycho:help:root",
+        "depends_on": [],
+        "ψ": {
+          "condition": "instrument_api_transport_parser_or_storage_failed"
+        },
+        "∇φ": {
+          "layer": "elemental",
+          "meaning": "runtime_transaction_failed"
+        },
+        "λ": {
+          "status": "ELEMENTAL_RUNTIME_FAILURE",
+          "outputs": [
+            "raw_log",
+            "last_confirmed_state",
+            "partial_artifacts",
+            "safe_exit"
+          ]
+        },
+        "Q": {
+          "status": "failed",
+          "constraint": "retry_only_within_approved_budget"
+        }
+      },
+      {
+        "node_id": "fam:psycho:help:anomaly",
+        "parent_id": "fam:psycho:help:root",
+        "depends_on": [],
+        "ψ": {
+          "condition": "approved_anomaly_definition_matched"
+        },
+        "∇φ": {
+          "route": "approved_safe_exit"
+        },
+        "λ": {
+          "status": "ANOMALY_CONTRACT_HIT",
+          "outputs": [
+            "stop_in_approved_order",
+            "preserve_logs",
+            "partial_finalize",
+            "READ_ONLY_HANDOFF"
+          ]
+        },
+        "Q": {
+          "status": "validated_in_context",
+          "constraint": "no_new_search_point_after_anomaly"
+        }
+      }
+    ],
+    "audit": {
+      "hash": "computed_by_help_api",
+      "trace": [
+        "HELP resource read is not instrument authorization"
+      ],
+      "patch_proposal": null
+    },
+    "status": "validated_in_context"
+  }
+}

@@ -8,7 +8,7 @@ Mac/Winメニューバー常駐のPythonアプリ。
 オシロスコープ・ロジアナ・WebCam・顕微鏡をMCPで統合し、  
 AIがスケマティックを読んで波形の眼を持つ。
 
-> **現在地:** 設計文書は確立済み、実装と実機検証はこれから開始する。
+> **現在地:** AI HELP専用MCPは実装・オフライン検証済み。計測器I/Oはゲート閉鎖中で、実機制御は未着手。
 >
 > 「設計済み」「実装済み」「実機確認済み」は別々に記録し、計画を動作実績として扱わない。
 
@@ -242,7 +242,40 @@ Phaseは責任境界・検証契約の成熟度、Seasonは手持ち実機から
 ```
 
 Python 3.11のネゴシエーション層とプレゼンテーション層を別venvへ作る。Phase 0では
-第三者依存、FastMCP、描画ライブラリ、SCPI通信を起動せず、実験ゲートが閉じていることだけを検証する。
+ネゴシエーション層にlock固定したFastMCPだけを導入し、プレゼンテーション層の描画依存、SCPI通信、
+instrument transportは起動しない。実機用experiment gateが閉じていることを引き続き検証する。
+
+### 最初に動くMCP: AI HELP専用面
+
+実機MCPより先に、接続AIへ
+[`MAD巫女サイエンティストふさもふのAIのためのオシロ虎の巻.proton.md`](docs/agi/MAD巫女サイエンティストふさもふのAIのためのオシロ虎の巻.proton.md)
+と[FAM探索flow](docs/agi/oscilloscope-help-flow.fam.json)を返すdocs-only MCPを実装する。このserverは
+SCPI、instrument IP、ApprovalSession token、socket、実機write capabilityを持たない。
+
+CLIでの確認:
+
+```bash
+.venv-negotiation/bin/python main.py help --format bundle
+.venv-negotiation/bin/python main.py help --format fam_json
+```
+
+MCP host用stdio entrypoint:
+
+```bash
+.venv-negotiation/bin/python main.py serve-help-mcp
+```
+
+公開面:
+
+| 種別 | 名前／URI | 内容 |
+|---|---|---|
+| tool | `list_help_topics` | allowlist済みHELP topic一覧 |
+| tool | `get_help` | Markdown、FAM JSON、またはbundleを返す |
+| resource | `psycho://help/oscilloscope-field-guide` | オシロ虎の巻全文 |
+| resource | `psycho://help/oscilloscope-fam-flow` | ψ／∇φ／λ／Q探索profile |
+
+このMCP面の成功は、FastMCP protocolと文書配布が動いたことだけを示す。SDS1204X-Eへの接続、SCPI、波形取得、
+ApprovalSessionの実装済み事実にはならない。実機用`serve-mcp`は引き続き閉じたexperiment gateで拒否する。
 
 承認機構は危険度に合わせて段階導入する。最初の固定IP・query-only識別実験は、まだ存在しない
 ApprovalSessionを前提にせず、人間が送信先、送信byte、回数、timeout、中止条件を固定したrunbookを
