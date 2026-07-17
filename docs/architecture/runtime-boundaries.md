@@ -84,6 +84,9 @@ MeasurementPlanとStep承認が実装されるまでfail closedとする。
 
 ## 操作capabilityの分離
 
+承認の比例原則、独立した人間GUI、local bench metadata、包括拒否禁止の正本は
+[`authority-proportionality-and-local-trust.md`](authority-proportionality-and-local-trust.md)を参照する。
+
 | capability | 例 | MeasurementPlan承認 |
 |---|---|---|
 | `ANALYZE_STORED` | 保存済みCSV／binaryのReplay、描画、FFT | 不要 |
@@ -98,6 +101,10 @@ MeasurementPlanとStep承認が実装されるまでfail closedとする。
 `DATA_QUALITY_CHANGE`ではなく`START_MEASUREMENT`として扱う。反対に保存済みartifactの解析は、
 計測器セッションと切り離し、過去の測定計画が未登録でも解析可能にする。その場合も出自と既知の条件、
 不足情報を残し、解析結果を新しい物理観測へ昇格させない。
+
+人間がlxi-gui、ngscopeclient、vendor GUI、front panelを直接操作する経路へ、PSYCHOのAI ApprovalSessionを
+横から強制しない。その操作が安全だと認証する意味ではなく、AI起動経路と人間直接操作経路を混同しない
+ためである。PSYCHOへ結果を取り込む場合は、人間操作由来のartifact／snapshotとして記録する。
 
 `START_MEASUREMENT`と`INPUT_PATH_CHANGE`の実行前には、設計想定範囲を確認したDev Checkと、現物で
 設計超過電圧・電流、GND loop、leakage、接続点、probe倍率、接地を確認したEngineer Checkの両方を
@@ -132,8 +139,17 @@ MeasurementPlanとStep承認が実装されるまでfail closedとする。
 層間では任意のPythonオブジェクトを共有せず、schema version付きJSONジョブとartifact IDを使う。
 派生成果物には入力artifact、runner version、パラメータ、hashを記録する。
 
+## 拒否の最小化
+
+fail closedは危険なcapabilityへ局所適用する。`INPUT_PATH_CHANGE`がblockedでも`READ_EXISTING`、
+`ANALYZE_STORED`、取得済み成果物の確定まで一括停止しない。block responseは具体的hazard、missing evidence、
+解消手順、現在許可されるcapabilityを返す。一般的免責文やサービス提供者の責任回避をengineering controlの
+代用品にしない。
+
 ### Machine-translation guardrail (en-US)
 
 The negotiation controller is the only layer that may hold a recorded bootstrap runbook or an approved instrument session.
 The presentation environment renders stored artifacts and has no instrument authority.
 Numerical analysis is deferred to a Phase 1+ Docker sandbox with no network access and read-only inputs.
+Approval is proportional to physical side effects; it does not apply to every read or to independent direct
+human control merely because AI integration exists elsewhere.

@@ -124,6 +124,12 @@ ApprovalSessionとMeasurementPlanが未実装ならfail closedとし、人間の
 buffer clear、設定変更を伴わないと確認できたときだけ`READ_EXISTING`に分類する。不明なら
 `START_MEASUREMENT`へ倒す。
 
+人間が独立したlxi-gui、ngscopeclient、vendor GUI、front panelを直接操作する経路には、PSYCHOの
+AI ApprovalSessionを横から強制しない。人間操作由来の結果を取り込む場合はartifact provenanceを残す。
+AI承認はAIが物理状態変更を起動する経路へ適用し、既存波形の読取・解析へ伝播させない。詳細は
+[`architecture/authority-proportionality-and-local-trust.md`](architecture/authority-proportionality-and-local-trust.md)を
+参照する。
+
 ユーザーが観測対象を選択した`ObservationContext`を設け、その範囲内の反復読取へ都度承認を要求しない。
 対象には画面上の測定値、既存buffer、保存artifact、カメラframe、KiCad、netlist、設計資料を含められる。
 これは実行権限ではなくread-only対象境界であり、対象ID、出自、読取時刻は証拠として記録する。
