@@ -96,6 +96,9 @@ MeasurementPlanとStep承認が実装されるまでfail closedとする。
 | `DATA_QUALITY_CHANGE` | 時間軸、既存artifactの切り出し | 安全承認は不要。変更と影響を記録 |
 | `START_MEASUREMENT` | AIによるarm、single、run、再取得 | Dev Check＋Engineer Check＋plan承認が必要 |
 | `INPUT_PATH_CHANGE` | 垂直感度、offset、倍率、結合、入力impedance、電流range | Dev Check＋Engineer Check＋plan承認が必要 |
+| `REVERSIBLE_INSTRUMENT_STATE` | 表示・保存形式等、入力曝露を変えない設定 | baseline、変更、restore結果を記録 |
+| `INSTRUMENT_STORAGE_MUTATION` | 機器内file作成・読取・削除 | path、目的、結果、cleanupを記録 |
+| `DATA_EGRESS` | MCP hostへsummary／slice／artifactを返す | 宛先と範囲を明示。外部host契約へhandoff |
 
 コマンド名ではなく実際の副作用で分類する。時間軸コマンドが取得開始、再arm、buffer clearを伴う機種では
 `DATA_QUALITY_CHANGE`ではなく`START_MEASUREMENT`として扱う。反対に保存済みartifactの解析は、
@@ -109,6 +112,14 @@ MeasurementPlanとStep承認が実装されるまでfail closedとする。
 `START_MEASUREMENT`と`INPUT_PATH_CHANGE`の実行前には、設計想定範囲を確認したDev Checkと、現物で
 設計超過電圧・電流、GND loop、leakage、接続点、probe倍率、接地を確認したEngineer Checkの両方を
 同じplan hashへ結び付ける。対象点、DUT、配線、probe、GND、入力経路の変更で両確認を失効させる。
+
+Engineer CheckはAI、manager、budget ownerの代理入力で成立させない。実際に物理作業を行うexecutor、
+executor本人のstep受諾、現物を確認した主体、不足資源を同じplanへ記録する。AI接続や人員の空き時間を、
+probe／接地技能とphysical readinessの証拠へ変換しない。
+
+機器内fileや復元可能なGUI／保存設定の変更は、入力front end損傷と同じ物理gateへ一律に入れない。ただし
+before/after、対象path、cleanup、restore失敗は記録する。外部MCP／AI hostのdata policyは接続者とproviderの
+契約境界であり、PSYCHOは自身が返すdata範囲と宛先を表示するが、そのpolicyを理由にlocal readを拒否しない。
 
 各操作は確認済みbaselineに対する`hazard_delta`を持つ。絶対スコアが低いことは許可根拠にならない。
 `may_increase_exposure`または`unknown`なら二者確認側へ倒す。`neutral`を宣言できるのは、機種別の
