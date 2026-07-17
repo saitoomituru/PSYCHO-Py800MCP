@@ -26,6 +26,7 @@ htmlcov/
 /runs/
 /evidence/
 /.local/
+/state/private/
 
 # Build output
 /build/
