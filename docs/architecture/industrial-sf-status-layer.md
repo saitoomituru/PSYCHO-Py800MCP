@@ -2,6 +2,8 @@
 
 状態: `[DESIGNED]`
 
+Layer B正本: [ちくわ砲 — 幻想化によるProspective Meta-Safety](https://github.com/saitoomituru/ZeroRoomLab-manifest/blob/main/docs/philosophy/chikuwa-cannon-prospective-meta-safety.ja.md)
+
 ## 1. 目的
 
 当直者が技術詳細を読まなくても、青なら観測、黄なら一人足す、赤なら停止・復旧対応できる体制を
@@ -77,6 +79,9 @@ yellow／redは、危険へ向かう前に必要な組織能力を要求する`R
 
 SF演出は人を被告化せず、作業・現場・計画を走査対象にする。themeをoffにしてもsemantic、監査、
 accessibility、block条件は変わらない。
+
+幻想だから軽いわけではなく、幻想だからlive incidentや現在課題が消えるわけでもない。plain warningと
+prospective themeは別paneで同時表示でき、themeがwarningを覆うlayoutを許可しない。
 
 `PROSPECTIVE`では、まだ存在しない未来をscanしていることを明示する。演出が確実な予知や事故確率を
 装わないよう、projection basis、unknown、snapshot時刻を常時表示する。

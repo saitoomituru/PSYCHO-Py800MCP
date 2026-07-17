@@ -10,6 +10,9 @@
 - `[DESIGNED]` 安全を責任表示でなく、実行前に組み上げるengineering capabilityとして扱う。
 - `[DESIGNED]` SF／gaming演出は決裁側の注意を事前配備へ向け、risk-taking rewardには使わない。
 - `[HYPOTHESIS]` alarm中心GUIが事後対応へ偏る場合の前段を補う。既存GUI全体の事後性は主張しない。
+- `[OBSERVED]` ZeroRoomLab-manifest commit `1eebff3`で、ちくわ砲をLayer B哲学正本として追加した。
+- `[DESIGNED]` PSYCHO側をLayer A写像とし、manifest本文を複製せず参照する。
+- `[DESIGNED]` 幻想paneはlive warning、現在課題、実測事実を軽くせず、覆わず、消さない。
 
 ## Claim Boundary
 
