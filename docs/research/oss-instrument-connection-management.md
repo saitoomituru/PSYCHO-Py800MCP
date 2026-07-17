@@ -88,6 +88,9 @@ oscilloscopeがあり、SDS1000X系も掲載される。[Driver options](https:/
 
 ## 7. 推奨borrow方針
 
+`liblxi`公開API、`lxi-tools`のCLI/Lua/GUI/screenshot plugin、dynamic link方式の詳細監査は
+[`liblxi-lxi-tools-method-audit.md`](liblxi-lxi-tools-method-audit.md)を参照する。
+
 ### borrow候補
 
 - lxi-guiの`Name + IP + protocol + port`追加・編集UX
