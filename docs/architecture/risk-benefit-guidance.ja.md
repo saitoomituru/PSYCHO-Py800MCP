@@ -13,11 +13,14 @@ capital、schedule、quality、option valueへ翻訳する。
 
 本ガイダンスは安全ゲート、MeasurementPlan承認、法的責任判定ではない。
 
+二つのscoreは`scale_kind=ordinal_metaphor`の会話用メタ表記である。1点差、比率、積に定量的意味はなく、
+円、確率、事故率、損害額、ROI、企業価値へ換算しない。
+
 ## 2. スコアの意味
 
 ### ExecutionRiskScore
 
-提案された執行の物理risk、損失曝露、unknown、必要checkをプレゼンテーション用に正規化した値。
+提案された執行の物理risk、影響の重さ、unknown、必要checkをプレゼンテーション用に並べた順序値。
 ユーザー成立済み観測をAIが読むだけなら、その読取行為自体はriskへ加算しない。
 
 ### EvidenceValueScore
@@ -35,7 +38,7 @@ capital、schedule、quality、option valueへ翻訳する。
 
 profile ID: `ja-JP-cat-v0`
 
-両scoreは暫定的に0〜300へ正規化する。300超は`300+`表示とし、数値精度を装わない。
+両scoreは暫定的に0〜300の順序表示へmappingする。300超は`300+`表示とし、数値精度を装わない。
 
 | ExecutionRiskScore | 表示band |
 |---:|---|
@@ -61,6 +64,7 @@ profile ID: `ja-JP-cat-v0`
 ```json
 {
   "profile_id": "ja-JP-cat-v0",
+  "scale_kind": "ordinal_metaphor",
   "execution_risk_score": 200,
   "evidence_value_score": 250,
   "evidence_necessity": "QUALITY_OR_DECISION",
@@ -129,4 +133,5 @@ Engineer viewへdrill-downできるようにする。
 ### Machine-translation guardrail (en-US)
 
 The two scores are presentation values, not instrument permissions. Guidance text explains the
-risk-benefit tradeoff and the next human decision. Speech is an optional rendering of the same message.
+risk-benefit impression and the next human decision. They are not money, probability, ROI, damages,
+or company valuation. Speech is an optional rendering of the same message.

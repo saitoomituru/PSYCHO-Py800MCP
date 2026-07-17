@@ -61,13 +61,17 @@ PSYCHO-PASSの犯罪係数風に、現在の現場状態を技術非専門の管
 計画監査が必要」「ここからは高リスクなので増員」という運用状況の圧縮プレゼンテーションである。
 
 Devや現場エンジニアへ電気の危険を教える画面ではない。彼らが定格、波形、GND、接続を見て察知した
-「香ばしさ」を、予算、停止損失、品質価値、schedule、project optionの言葉へ翻訳し、技術詳細を追わない
-決裁者へ届かせる。Engineer viewは根拠正本、Executive viewは金勘定へ変換した要約である。
+「香ばしさ」を、停止影響、品質価値、schedule、project optionの言葉へ翻訳し、技術詳細を追わない
+決裁者へ届かせる。Engineer viewは根拠正本、Executive viewは決裁言語へ変換した要約である。
 
 責任追及だけを前面に出すと「面倒ならやるな」「賠償能力のある権威者へ投げろ」という権力倒れを招く。
-そこでDashboardは、機材・停止・再試験等のRiskExposureと、欠陥発見、手戻り削減、学習価値、schedule、
-再利用可能な証拠等のBenefitProjectionを同じ強さで並べる。高リスク・高ベネフィットは自動却下せず、
+そこでDashboardは、機材・停止・再試験等のRiskSignalと、欠陥発見、手戻り削減、学習価値、schedule、
+再利用可能な証拠等のBenefitSignalを同じ強さで並べる。高リスク・高ベネフィットは自動却下せず、
 必要な人員、予算、確認を足して進めるdecision packetへ変換する。
+
+係数は円、損害確率、事故率、ROI、企業価値へ換算できない`ordinal_metaphor`である。何円失う、時価総額へ
+いくら寄与する、といった定量財務エビデンスを本GUIは生成しない。犯罪係数風の「なんか香ばしい／
+割に合いそう」を共有する会話用メタ表記であり、理由カテゴリと`UNKNOWN`を併記する。
 
 主画面は「何が得られるか」「何を失い得るか」「何を足せば進めるか」「誰の決定が必要か」を短く示す。
 法的賠償責任は詳細画面へ分離し、契約、保険、法域、組織決裁が未入力なら`UNDETERMINED`とする。
@@ -100,6 +104,7 @@ AIによる測定開始または破壊方向・影響不明の入力経路変更
 > high-value work can be staffed and reviewed instead of being rejected merely because it is complex.
 > The primary audience is the nontechnical budget and decision layer; the engineering view remains the
 > evidence source, not a tutorial for engineers.
+> Scores are ordinal metaphors. They are not money, probability, ROI, damages, or company valuation.
 
 ---
 

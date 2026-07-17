@@ -228,10 +228,11 @@ GUIを人間の承認・中止面として実装し、動的規格解決、Measu
 係数からApprovalSessionを生成したり、承認を推測したりしない。詳細は
 [`architecture/stakeholder-risk-dashboard.md`](architecture/stakeholder-risk-dashboard.md)を参照。
 
-Dashboardでは`DecisionRoleMap`、`RiskExposure`、`BenefitProjection`、`LegalLiabilityStatus`を分離する。
-RiskExposureとBenefitProjectionはrange、根拠、confidenceを同じ画面で対にして表示する。
+Dashboardでは`DecisionRoleMap`、`RiskSignal`、`BenefitSignal`を分離する。二つのsignalは
+`scale_kind=ordinal_metaphor`と理由コードを持ち、同じ画面で対にして表示する。
 高リスク・高ベネフィットは却下へ直結させず、必要人員、予算、check、決定権限をdecision packetへまとめる。
-法的責任は詳細情報とし、契約・保険・法域が不明なら`UNDETERMINED`にする。
+円、確率、損害額、ROI、企業価値、法的賠償額を算出しない。法的責任と正式な財務評価は本Dashboardの
+scope外とし、ユーザー提供の決裁資料がある場合も係数へ混ぜず参照IDだけを保持する。
 
 `ExecutionRiskScore`と`EvidenceValueScore`から再現可能な日本語ガイダンスを生成し、画面表示を正本、
 音声合成を任意の派生出力とする。文面は自由生成だけに任せず、score band、evidence necessity、unknown、
