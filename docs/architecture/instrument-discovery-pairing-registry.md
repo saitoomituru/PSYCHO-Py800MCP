@@ -1,0 +1,169 @@
+# Instrument Discovery & Pairing Registry
+
+状態: `[DESIGNED]` `[UNKNOWN: SDS1204X-E mDNS advertisement]`
+
+## 1. 目的
+
+LAN計測器のIPがDHCP等で変わっても機器を迷子にせず、発見したnetwork endpointと、人間が確認済みの
+計測器identityを分離して管理する。探索は低侵襲な方式から段階的に行い、発見だけでSCPI権限や
+ペアリングを生成しない。
+
+## 2. 現時点の根拠
+
+- `[FACT: vendor documentation]` SDS1000X-E系はVXI-11、Web control、SCPI Socket 5025、
+  SCPI Telnet 5024を公式資料で掲げている。
+- `[FACT: vendor documentation search]` 確認したSDS1000X-E User ManualとProgramming Guideには、
+  mDNS、Bonjour、DNS-SD、mDNS hostnameの明記を確認できなかった。
+- `[FACT: LXI specification]` LXI 1.3以降のconformant deviceはmDNS/DNS-SDをsupportする。
+- `[UNKNOWN]` SDS1204X-Eの現在firmwareがmDNS/DNS-SD広告を実際に出すか、どのservice typeを広告するか。
+- `[INFERRED]` SIGLENT資料の「VXI-11 (LXI)」表記だけでは、LXI適合versionやmDNS実装を断定できない。
+
+参照:
+
+- [SIGLENT SDS1000X-E Programming Guide](https://www.siglent.com/wp-content/uploads/2024/08/SDS1000-SeriesSDS2000XSDS2000X-E_ProgrammingGuide_PG01-E02D-1.pdf)
+- [SIGLENT SDS1000X-E Datasheet](https://int.siglent.com/u_file/download/24_07_01/SDS1000X-E_DataSheet_EN04G.pdf)
+- [LXI Device Specification 1.6.1](https://public.lxistandard.org/specifications/LXI_1.6_Specifications/LXI_Device_Specification_1.6.1_2024-01-18.pdf)
+
+## 3. 用語境界
+
+BonjourはAppleのmDNS/DNS-SD実装・製品名であり、mDNSと競合する別の探索規格として扱わない。
+実装契約では`mdns_dns_sd`、macOS上のprovider表示では`Bonjour`を使用する。
+
+次を分離する。
+
+- **discovered endpoint:** network上に何かが広告または応答した
+- **identified instrument:** query-only識別でvendor/model等を観測した
+- **paired instrument:** 観測identityを人間が対象機として確認した
+- **capable instrument:** 個別capabilityを実験で確認した
+
+`discovered != identified != paired != capable`とする。
+
+## 4. 探索順序
+
+ローカルregistryはnetwork I/O前に読み、既知identityと過去endpointを候補照合へ使う。network探索は
+次の順序で段階的に許可する。
+
+1. `mDNS/DNS-SD browse`
+   - `_lxi._tcp.local.`
+   - `_vxi-11._tcp.local.`
+   - `_scpi-raw._tcp.local.`
+   - `_scpi-telnet._tcp.local.`
+   - `_http._tcp.local.`は候補補助に限定し、一般Web機器を計測器認定しない
+2. `user-supplied exact IP`
+   - mDNS広告が観測されない場合、ユーザーが画面で確認した完全一致IPだけを候補化する
+3. `VXI-11 discovery`
+   - 明示したinterfaceとsubnetに限定したUDP/RPC portmapper discovery
+4. `bounded subnet probe`
+   - 対象CIDR、port、packet、回数、timeoutを固定した最後の手段
+
+mDNS browseもnetwork packetを送受信する実験である。offline処理として偽装せず、runbook hashと人間の
+明示起動を要求する。ただしSCPI送信、設定変更、取得開始とは別capabilityにする。
+
+## 5. mDNS観測runbook要件
+
+- 使用network interfaceを一つに固定
+- 対象service typeを上記allowlistへ固定
+- 観測時間を有界化し、自動常駐させない
+- browse queryと受信recordを原本保存
+- service instance、hostname、SRV port、TXT、A/AAAA、TTL、interface、timestampを記録
+- 観測なしを`NOT_OBSERVED`とし、非対応断定へ変換しない
+- 広告されたhostname、TXT、portを未信頼入力として長さ・文字種・件数制限する
+- mDNS結果から自動的にWeb page、VXI-11、SCPI Socketへ接続しない
+
+最初の試験は「広告を観測できたか」だけを判定し、機器識別は別のquery-only runbookへ渡す。
+
+## 6. SQLite Pairing Registry
+
+推奨local pathはGit外の`state/private/instrument-pairing.sqlite3`とする。生DB、IP、MAC、未匿名化serialを
+Gitへcommitしない。schema migration versionと生成アプリversionを保持する。
+
+### 6.1 tables
+
+#### `instruments`
+
+- `instrument_id`: project内UUID。IPやhostnameをIDにしない
+- `vendor`, `model`, `serial_private`, `firmware_last_seen`
+- `pairing_state`: `discovered / identified / user_paired / conflict / revoked`
+- `first_seen_at`, `last_seen_at`, `paired_at`
+- `user_confirmation_ref`
+
+#### `endpoints`
+
+- `endpoint_id`, `instrument_id`
+- `transport`: `mdns / vxi11 / scpi_raw / scpi_telnet / http`
+- `hostname`, `ip_address`, `port`, `network_interface`, `subnet_scope`
+- `first_seen_at`, `last_seen_at`, `record_ttl`, `source_sighting_id`
+- `active_state`: `candidate / verified / stale / conflict`
+
+endpointは履歴として残し、IP変更時に上書き消去しない。
+
+#### `sightings`
+
+- 観測run、時刻、method、raw artifact ID、広告service/TXT、応答分類
+- `observed / not_observed / malformed / timeout / conflict`
+- evidence hash
+
+#### `identity_evidence`
+
+- source: `idn_response / mdns_txt / user_entry / mac_observation / vendor_web`
+- observed valueまたはprivate valueへのreference
+- confidenceではなく`evidence_state`
+- timestamp、artifact ID
+
+#### `capabilities`
+
+- capability name、`designed / detected / identified / data_verified / control_verified`
+- firmware、transport、evidence artifact、last verified
+
+## 7. identity照合とpairing
+
+mDNS instance名、hostname、IP、MACのいずれか一つを恒久identityにしない。DHCP、hostname conflict、
+network adapter変更、firmware差で変化し得るため、identity evidence setとして扱う。
+
+pairing昇格には最低限、次を必要とする。
+
+1. discovery sighting
+2. 別runbookによるquery-only identity応答
+3. vendor/model/serial/firmware等、実際に返ったfieldの原本保存
+4. ユーザーによる対象機確認
+5. endpointとidentityの結合event保存
+
+同一endpointから前回と異なるidentityが返る、または同一identityが同時に複数endpointへ現れた場合は
+`conflict`へ倒し、自動再pairしない。serialが空または重複する機種も想定し、単一field一致で昇格させない。
+
+## 8. 起動時の再発見
+
+1. registryをread-onlyで開き、paired identityとendpoint履歴を読む
+2. mDNS/DNS-SDを有界browseし、stable identity候補へ照合する
+3. 一致候補がなければlast-known endpointを`stale candidate`として提示する
+4. ユーザー指定IPがあれば候補へ追加する
+5. query-only gate内でidentityを再確認する
+6. 一致後だけ`verified endpoint`へ更新する
+
+last-known IPへ黙ってSCPI送信しない。別機器へDHCP leaseが移った可能性を常に考慮する。
+
+## 9. 保全と公開境界
+
+- SQLiteはWAL modeとtransactionを使い、pairing eventをatomicに保存する
+- migration前に整合検査とrecoverable backupを作る
+- DB破損時はnetwork探索から再構成できるよう、raw sighting artifactを別保存する
+- 公開ログにはIP、MAC、serial、生SQLiteを出さない
+- 必要ならvendor/model、内部instrument ID、redacted endpoint countだけを公開manifestへexportする
+- credential、ApprovalSession token、SCPI秘密値をPairing Registryへ保存しない
+
+## 10. Season 0受入条件
+
+- mDNS広告の有無を`OBSERVED / NOT_OBSERVED`で記録できる
+- mDNSがなくても完全一致IPから別runbookへ進める
+- IPが変わってもinstrument identityとendpoint履歴を分離できる
+- discovery結果だけでpairedまたはcapableにならない
+- hostname衝突、IP再利用、identity不一致をfail closedにできる
+- registryなしでも再探索可能で、registryが実機権限の正本にならない
+- 生DBとprivate identifierがGitへ入らない
+
+### Machine-translation guardrail (en-US)
+
+Bonjour is an implementation of mDNS/DNS-SD, not a separate competing discovery protocol. SDS1204X-E
+mDNS advertisement is currently unverified. Discovery records are untrusted sightings, not paired identity
+or instrument authority. The local SQLite registry tracks stable instrument identity separately from mutable
+IP addresses and hostnames; pairing requires query-only identity evidence and explicit user confirmation.
