@@ -18,6 +18,11 @@
 - `[DESIGNED]` 操作責任線、金銭曝露、法的賠償責任の状態を分離する。
 - `[DESIGNED]` 機材・DUT、停止、再試験、事故対応、第三者影響と追加人員費をrangeで比較可能にする。
 - `[DESIGNED]` 契約・保険・法域が未確認なら法的賠償責任を`UNDETERMINED`とし、AIが推定しない。
+- `[DESIGNED]` 責任追及を主画面にせず、RiskExposureとBenefitProjectionを同じ強さで表示する。
+- `[DESIGNED]` 高リスク・高ベネフィットを自動却下せず、人員・予算・checkのdecision packetへ変換する。
+- `[DESIGNED]` 非専門者向け要約とエンジニア向け詳細を同じsnapshot IDで結ぶ二層UIとする。
+- `[DESIGNED]` 管理側の応答はfund、staff、request changes、defer、decline with reasonとし、
+  Dashboardから実機を開始しない。
 
 ## Claim Boundary
 
@@ -34,4 +39,7 @@
 - [ ] 状態snapshot schemaを設計する
 - [ ] 色覚に依存しない最小wireframeを作る
 - [ ] 係数式は実測runと運用レビュー後に別決定記録で確定する
-- [ ] CostExposure schemaと根拠・confidence・currencyの必須項目を設計する
+- [ ] RiskExposure schemaと根拠・confidence・currencyの必須項目を設計する
+- [ ] BenefitProjection schemaと非金銭価値の単位を設計する
+- [ ] decision packetの管理側・エンジニア側wireframeを対で作る
+- [ ] decision packet IDによる管理側・現場側の往復schemaを設計する

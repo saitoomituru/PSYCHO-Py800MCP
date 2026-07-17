@@ -60,10 +60,13 @@ PSYCHO-PASSの犯罪係数風に、現在の現場状態を技術非専門の管
 メタGUI表示。目的は安全判定の自動化ではなく、「いまは観測・数値ログ支援だけ」「次は自動検査なので
 計画監査が必要」「ここからは高リスクなので増員」という運用状況の圧縮プレゼンテーションである。
 
-この読み手には責任が金銭曝露として初めて届く場合があるため、Dashboardは役割名だけで終わらせない。
-機材・DUT交換、停止時間、再試験、事故対応、第三者影響の概算rangeと根拠を表示し、追加人員の費用と
-確認を省略した場合の曝露を並べる。ただしAIは法的賠償責任者を推定しない。契約、保険、法域、組織決裁が
-未入力なら`LEGAL LIABILITY: UNDETERMINED`を明示し、技術担当者へ勝手に賠償責任を転嫁しない。
+責任追及だけを前面に出すと「面倒ならやるな」「賠償能力のある権威者へ投げろ」という権力倒れを招く。
+そこでDashboardは、機材・停止・再試験等のRiskExposureと、欠陥発見、手戻り削減、学習価値、schedule、
+再利用可能な証拠等のBenefitProjectionを同じ強さで並べる。高リスク・高ベネフィットは自動却下せず、
+必要な人員、予算、確認を足して進めるdecision packetへ変換する。
+
+主画面は「何が得られるか」「何を失い得るか」「何を足せば進めるか」「誰の決定が必要か」を短く示す。
+法的賠償責任は詳細画面へ分離し、契約、保険、法域、組織決裁が未入力なら`UNDETERMINED`とする。
 
 ユーザーがすでにプローブしている画面や値をAIが読む行為は、人間の目視・転記を補助する
 `OBSERVING`として表示し、それ自体へ作業リスクを加算しない。自動検査、測定開始、入力経路変更では、
@@ -84,7 +87,8 @@ AIによる測定開始または破壊方向・影響不明の入力経路変更
 > **en-US guardrail:** The Gestalt score is a stakeholder communication display, not a safety decision
 > or authorization mechanism. It summarizes the current work mode, unresolved checks, responsible
 > roles, staffing needs, and evidence-backed cost exposure. Technical gates remain authoritative,
-> and the dashboard does not determine legal liability.
+> and the dashboard does not determine legal liability. Risk and benefit are shown together so that
+> high-value work can be staffed and reviewed instead of being rejected merely because it is complex.
 
 ---
 
