@@ -23,6 +23,11 @@
 - `[DESIGNED]` 非専門者向け要約とエンジニア向け詳細を同じsnapshot IDで結ぶ二層UIとする。
 - `[DESIGNED]` 管理側の応答はfund、staff、request changes、defer、decline with reasonとし、
   Dashboardから実機を開始しない。
+- `[DESIGNED]` ExecutionRiskScoreとEvidenceValueScoreからversion付き日本語templateで一文ガイダンスを出す。
+- `[DESIGNED]` risk 200/value 250、risk 180/value 100、risk 250+/value 50を受入例として固定した。
+- `[DESIGNED]` 画面文を正本、TTSを同一message IDの任意派生出力とし、TTSへ実機権限を渡さない。
+- `[DESIGNED]` 主対象はDev／Engineerではなく、技術根拠を金銭・日程・品質へ変換できていない決裁層とする。
+- `[DESIGNED]` Engineer viewを根拠正本、Executive viewを同じsnapshotの意思決定翻訳として分離する。
 
 ## Claim Boundary
 
@@ -43,3 +48,5 @@
 - [ ] BenefitProjection schemaと非金銭価値の単位を設計する
 - [ ] decision packetの管理側・エンジニア側wireframeを対で作る
 - [ ] decision packet IDによる管理側・現場側の往復schemaを設計する
+- [ ] `ja-JP-cat-v0`のmessage routingをofflineテストへ落とす
+- [ ] TTSのdeduplicate、rate limit、muteをpresentation runtimeで試験する

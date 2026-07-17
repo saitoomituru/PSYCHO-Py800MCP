@@ -233,6 +233,10 @@ RiskExposureとBenefitProjectionはrange、根拠、confidenceを同じ画面で
 高リスク・高ベネフィットは却下へ直結させず、必要人員、予算、check、決定権限をdecision packetへまとめる。
 法的責任は詳細情報とし、契約・保険・法域が不明なら`UNDETERMINED`にする。
 
+`ExecutionRiskScore`と`EvidenceValueScore`から再現可能な日本語ガイダンスを生成し、画面表示を正本、
+音声合成を任意の派生出力とする。文面は自由生成だけに任せず、score band、evidence necessity、unknown、
+不足checkからversion付きtemplateで選ぶ。音声層は実機権限を持たず、状態変化時だけrate-limitして読む。
+
 承認済み計画は規格アップグレードで黙って変更しない。新版を検出した場合は、ユーザーへ新版原本または
 更新要求項目の投入を依頼し、新しいSourceBundle、数理環境、plan hashを作って再承認を要求する。
 GUI中止後は新規操作を止め、事前承認済みの
