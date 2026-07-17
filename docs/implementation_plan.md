@@ -222,6 +222,16 @@ GUIを人間の承認・中止面として実装し、動的規格解決、Measu
 部分データ確定、MCPホスト向けread-only成果物面を統合する。KiCad、Vision、ngspice、
 リバースモード、自律スイープも扱うが、Season 0〜2の証拠なしに先行実装しない。
 
+同じGUIへStakeholder Risk Dashboardを置く。技術非専門の管理、人事、出資、現場責任者へ、現在が
+観測補助、解析、計画監査待ち、二者確認待ち、承認済み実行、高リスク作業、中止・縮退のどこかを
+係数、状態語、アイコン、必要人員で示す。係数は技術ゲートの出力を圧縮するread-only projectionであり、
+係数からApprovalSessionを生成したり、承認を推測したりしない。詳細は
+[`architecture/stakeholder-risk-dashboard.md`](architecture/stakeholder-risk-dashboard.md)を参照。
+
+Dashboardでは`OperationalAccountability`、`CostExposure`、`LegalLiabilityStatus`を分離する。
+CostExposureは機材・DUT、停止時間、再試験、事故対応、第三者影響をrangeと根拠付きで表示する。
+契約・保険・法域の資料がなければLegalLiabilityStatusを推測せず`UNDETERMINED`にする。
+
 承認済み計画は規格アップグレードで黙って変更しない。新版を検出した場合は、ユーザーへ新版原本または
 更新要求項目の投入を依頼し、新しいSourceBundle、数理環境、plan hashを作って再承認を要求する。
 GUI中止後は新規操作を止め、事前承認済みの

@@ -56,14 +56,35 @@ ngspiceシミュとの自動照合
 
 ## ゲシュタルト係数
 
-LLMの倫理判断ではなく、IEC 61508等の機能安全の考え方を参照するプロジェクト固有の定量リスク計算。
-現時点で規格適合または認証取得を主張しない。
-装備選択を「感覚」から「数値」に変える。
+PSYCHO-PASSの犯罪係数風に、現在の現場状態を技術非専門の管理者、人事、出資者にも一目で伝える
+メタGUI表示。目的は安全判定の自動化ではなく、「いまは観測・数値ログ支援だけ」「次は自動検査なので
+計画監査が必要」「ここからは高リスクなので増員」という運用状況の圧縮プレゼンテーションである。
+
+この読み手には責任が金銭曝露として初めて届く場合があるため、Dashboardは役割名だけで終わらせない。
+機材・DUT交換、停止時間、再試験、事故対応、第三者影響の概算rangeと根拠を表示し、追加人員の費用と
+確認を省略した場合の曝露を並べる。ただしAIは法的賠償責任者を推定しない。契約、保険、法域、組織決裁が
+未入力なら`LEGAL LIABILITY: UNDETERMINED`を明示し、技術担当者へ勝手に賠償責任を転嫁しない。
+
+ユーザーがすでにプローブしている画面や値をAIが読む行為は、人間の目視・転記を補助する
+`OBSERVING`として表示し、それ自体へ作業リスクを加算しない。自動検査、測定開始、入力経路変更では、
+計画責任者、監査者、Dev Check、Engineer Check、必要人員、未確認事項を係数と同じ画面へ出す。
 
 旧版の係数閾値と「即時執行可」という対応表は廃止予定で、実装権限へ使用しない。絶対スコアの
 高低ではなく、人間が成立させた現在状態から次の操作が破壊方向へ倒れるかを`hazard_delta`として判定する。
 AIによる測定開始または破壊方向・影響不明の入力経路変更には、設計想定範囲を確認するDev Checkと、
 実際のプロービング対象を確認するEngineer Checkの両方を必要とする。
+
+係数はプレゼンテーション用の派生値であり、低い値が操作を許可せず、高い値が自動的に操作を禁止する
+わけでもない。実行可否は独立した技術ゲートが決める。係数表示には必ず状態語、根拠、必要な次の人員を
+併記し、`UNKNOWN`を平均値へ埋めない。
+
+> `[POEM]` 数式を読まない偉い猫にも、青なら観測、黄なら計画を見ろ、赤なら人を呼べ、と一秒で
+> 伝えるための計器盤。ただし猫の肉球で安全ゲートは開かない。
+
+> **en-US guardrail:** The Gestalt score is a stakeholder communication display, not a safety decision
+> or authorization mechanism. It summarizes the current work mode, unresolved checks, responsible
+> roles, staffing needs, and evidence-backed cost exposure. Technical gates remain authoritative,
+> and the dashboard does not determine legal liability.
 
 ---
 

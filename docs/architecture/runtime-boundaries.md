@@ -41,6 +41,7 @@ Negotiation Controller venv
 - 実機IP、SCPI資格情報、ApprovalSession tokenを受け取らない
 - 任意のローカルパスを開かない
 - 原本を上書きしない
+- ゲシュタルト係数や色表示から実機権限、承認、SCPIコマンドを生成しない
 
 ## 数理解析Dockerの将来契約
 
@@ -115,6 +116,16 @@ MeasurementPlanとStep承認が実装されるまでfail closedとする。
 カメラ移動は電気測定開始ではないため、設定済みの非接触可動範囲内なら`MOVE_OBSERVER`として扱う。
 カメラ機構がDUT、probe、配線、GNDへ接触し得る、または照明・出力が対象へ影響し得る場合は
 観測面から外し、`hazard_delta=unknown`として別計画へ戻す。
+
+## Stakeholder Risk Projection
+
+ネゴシエーション層は技術ゲートの状態、`hazard_delta`、check状態、plan hash、作業mode、必要人員を
+署名対象の状態snapshotとして出力する。プレゼンテーション層はそのsnapshotだけから係数、状態語、
+アイコン、説明カードを描画する。表示層からネゴシエーション層へ承認や操作を逆流させない。
+
+観測読取は`OBSERVING`として表示し、AIが人間の数値転記を補助しているだけなら追加の作業リスクを
+付与しない。自動検査を計画・開始する時点で、計画責任者、監査者、Dev Check、Engineer Check、
+不足人員を表示する。係数の数値だけを保存せず、算出元snapshotと理由コードを結び付ける。
 
 ## IPC
 
