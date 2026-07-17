@@ -279,6 +279,111 @@ AIが測定を開始する場合と入力経路を変更する場合に必須。
 capability snapshot、TTL、AbortPlan、Dev Check、Engineer Checkへ承認する。
 計画の重要項目が変わった場合は承認を失効させる。
 
+### Bounded Measurement Envelope
+
+自動化された反復測定では、垂直感度やoffsetを一操作ごとに確認させず、ユーザーが事前に承認した
+`MeasurementEnvelope`の内側だけをApprovalSessionへ許可する。envelopeは少なくとも次を固定する。
+
+- DUT、測定点、channel、probe ID、probe倍率、接地点または物理GND route hash
+- 期待入力電圧の通常範囲と過渡範囲、極性、周波数範囲、source impedance
+- 許可する入力impedance、AC／DC／GND coupling、垂直感度、offsetの上下限
+- DUT電源、保護relay、負荷、信号源等のstateと、そのstate間の許可遷移
+- 最大設定変更回数、最大AUTO試行回数、TTL、停止条件、範囲外時の処理
+
+承認はこの不変envelopeとplan hashへ付与し、envelope内の反復だけをまとめる。電圧・周波数・probe・
+coupling・impedance・物理GND・DUT／source stateのいずれかが範囲外または`UNKNOWN`なら、範囲を自動拡張
+せず`HOLD_AND_REPLAN`へ移る。TTL切れ、測定点変更、物理配線変更、plan hash変更でも再承認を要求する。
+
+自動化を開始する前に、ネゴシエーション層はADC／入力front end／probeへ実際に曝露し得る最大電圧、過渡、
+offset、入力impedance、probe倍率、coupling、接地条件を`PhysicalExposureEnvelope`としてユーザーへ提示する。
+最終判断はユーザーの明示承認であり、AIのrisk score、AUTO結果、過去runから暗黙承認しない。承認後は範囲内の
+反復を自動化し、毎stepの確認dialogを要求しない。
+
+一方、物理曝露を変えない探索は`ObservationWindowPolicy`へ分離し、AIが自動調整できる。
+
+- horizontal time window、sample rate、memory depth、pre／post-trigger比
+- input exposureを変えないことが確認済みのanalog bandwidth limit
+- 既存artifactのFFT帯域、filter、decimation、時間区間、比較窓
+- trigger条件の候補計算と、承認済み測定session内でのre-arm回数
+
+これにより、低周波対象でも高周波漏れを確認する、音響対象でも1-bit DSD由来の帯域外noiseを探す等の
+観測戦略をAIが選べる。観測窓の変更はdata-qualityと取得stateへ影響するため全変更を記録し、機種固有動作が
+垂直入力経路、source出力、buffer clear、無制限re-armへ波及する場合は該当capabilityへ再分類する。
+
+scope内の`GND`は二種類を分離する。計測器内部のAC／DC／GND coupling切替は列挙したenvelope内で扱えるが、
+GNDからlive inputへ戻す遷移は入力曝露の再開として記録する。probeのground lead、差動probe、絶縁、
+外部bypass等の物理接地変更はenvelope内の単純反復に含めず、Engineer Checkをやり直す。
+
+### AUTO／Autosetの扱い
+
+計測器front panelまたは独立vendor GUIで人間が直接AUTOを押す経路は、PSYCHOのAI承認経路外として
+人間操作由来snapshotを取り込める。一方、AI／MCPがAUTO／Autoset commandを送る場合は、vendor機能で
+あってもPSYCHOが起動した複合状態変更である。SDS1000X-Eの公式資料ではAUTOが垂直scale、水平timebase、
+trigger mode等を変更するため、`READ_EXISTING`には分類しない。
+
+初期実装では既存bufferと現在設定から候補をoffline計算する`AUTOSET_PROPOSE`を優先し、実機へ送らない。
+将来`AI_REMOTE_AUTOSET`を許可するときは、次をすべて満たす。
+
+- AUTO自体が承認envelopeに明記され、実行前snapshotとrollback候補がある
+- 実行回数に小さい上限があり、AUTO結果を次のAUTO開始条件へ自動連鎖させない
+- 結果を候補状態としてenvelopeと比較し、範囲外なら採用せず停止する
+- `signal_presence=NOT_OBSERVED | UNKNOWN`ではrange探索を広げず、`HOLD_AND_REPLAN`へ移る
+- 機種固有副作用、rollback可否、buffer clear／re-armの有無が`UNKNOWN`なら実行しない
+
+「無信号だからさらに感度またはrangeを動かす」は許可根拠にならない。無信号、低confidence、飽和、
+不安定triggerは測定対象の不在、起動前state、配線不成立、想定外DC等を区別できないためである。
+
+参考: SIGLENT公式の
+[SDS1000X-E User Manual](https://siglentna.com/download/22002/) と
+[Oscilloscope Programming Guide](https://siglentna.com/download/17013/)。
+
+### state-aware envelope: audio amplifier例
+
+audio amplifierの起動観測では、定常波形だけを一つのrangeで扱わない。少なくとも次を別stateにする。
+
+1. `POWER_OFF`
+2. `POWER_ON_RELAY_OPEN_TRANSIENT`
+3. `RELAY_CLOSE_TRANSITION`
+4. `STEADY_STATE`
+5. `POWER_OFF_TRANSIENT`
+
+安全relay接続前には起動時DC spikeまたはoffsetが存在し得るため、各stateへ別の電圧・時間window、期待される
+relay状態、pre-trigger条件、停止条件を与える。無信号の`POWER_OFF`またはrelay open中の観測を定常状態と
+誤認してAUTOを反復しない。DUT再起動を伴う測定は、scopeのSTOP／armとDUT電源／relayのどちらを操作するかを
+別stepで明記し、許可された遷移順序から外れたら停止する。
+
+PSYCHOがrelayやDUT電源を制御しない場合も、その観測stateと人間が行う遷移をRunManifestへ残す。制御する
+場合は、relay接続や再投入を単なる描画・解析操作として扱わず、固有のDev Check、Engineer Check、
+ApprovalSessionを要求する。
+
+承認済みの自動周回は、操作対象を曖昧にしない次のstate machineとして表す。
+
+```text
+ACQUISITION_STOPPED
+  -> DUT_RESTART_REQUESTED
+  -> SETTLING
+  -> AUTOSET_ONCE
+  -> ENVELOPE_VALIDATION
+       -> CAPTURED
+       -> HOLD_AND_REPLAN
+       -> RANGE_EXHAUSTED
+
+RANGE_EXHAUSTED
+  -> PARTIAL_FINALIZE
+  -> ARTIFACT_HANDOFF
+  -> READ_ONLY_HANDOFF
+```
+
+ここで`ACQUISITION_STOPPED`はscope取得停止、`DUT_RESTART_REQUESTED`は観測対象の再起動であり、同じ
+STOP／START commandとして扱わない。`SETTLING`は計画に固定した時間または観測条件で打ち切る。
+`AUTOSET_ONCE`はenvelopeで明示承認された場合だけ存在し、認可最大rangeでも信号成立、飽和回避、期待DC範囲等を
+満たせなければ`RANGE_EXHAUSTED`とする。
+
+`RANGE_EXHAUSTED`は測定成功へ丸めず、`INCONCLUSIVE`のreason codeとしてwarningを出す。新しい測定や
+range拡張を停止し、その時点までの設定snapshot、SCPI log、取得片、timeout、判定根拠をappend-onlyで
+確定する。ユーザー指定のMCP hostへ許可された粒度だけをhandoffした後は`READ_ONLY_HANDOFF`へ移り、
+再承認なしに実機操作権限へ戻さない。
+
 ### Stage承認
 
 同一の物理接続・上限・コマンド分類内で複数stepをまとめる。低リスクの反復取得等で候補になる。
@@ -345,6 +450,11 @@ RUNNING
   -> SAFE_STOPPING
   -> FINALIZING_PARTIAL
   -> ABORTED_PARTIAL
+
+RUNNING
+  -> RANGE_EXHAUSTED
+  -> FINALIZING_PARTIAL
+  -> READ_ONLY_HANDOFF
 
 any state
   -> FAILED | BLOCKED
