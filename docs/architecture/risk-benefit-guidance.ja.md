@@ -65,6 +65,9 @@ profile ID: `ja-JP-cat-v0`
 {
   "profile_id": "ja-JP-cat-v0",
   "scale_kind": "ordinal_metaphor",
+  "time_scope": "PROSPECTIVE",
+  "risk_evidence_state": "PROJECTED",
+  "benefit_evidence_state": "PROJECTED",
   "execution_risk_score": 200,
   "evidence_value_score": 250,
   "evidence_necessity": "QUALITY_OR_DECISION",
@@ -77,25 +80,27 @@ profile ID: `ja-JP-cat-v0`
 `evidence_necessity`は`REQUIRED`、`QUALITY_OR_DECISION`、`OPTIONAL_REASSURANCE`、`UNKNOWN`を持つ。
 `UNKNOWN`をoptionalへ推測しない。
 
+測定前ガイダンスでは冒頭またはbadgeで「測定前予告」を示す。`PROJECTED`を`OBSERVED`と読み上げない。
+
 ## 5. 必須受入例
 
 ### Case A: risk 200 / value 250
 
-> 執行対象リスクは200、取得エビデンス価値は250です。プロジェクト継続・commit判断へ強く寄与する
+> 測定前予告です。執行対象リスクは200、取得エビデンス価値は250です。プロジェクト継続・commit判断へ強く寄与する
 > 可能性がある一方、危険性があります。必要な人員とcheckを揃え、計画を監査してから判断してください。
 
 推奨action: `ESCALATE_WITH_ENABLEMENT`
 
 ### Case B: risk 180 / value 100
 
-> 執行対象リスクは180、取得エビデンス価値は100です。一定のリスクがありますが、未確認点を潰すことで
+> 測定前予告です。執行対象リスクは180、取得エビデンス価値は100です。一定のリスクがありますが、未確認点を潰すことで
 > 品質管理へ寄与します。対象範囲を限定し、必要checkを確認してください。
 
 推奨action: `REVIEW_FOR_QUALITY_VALUE`
 
 ### Case C: risk 250+ / value 50 / evidence optional
 
-> 執行対象リスクは250を超え、取得エビデンス価値は50です。主な価値が安心材料に留まり、必須
+> 測定前予告です。執行対象リスクは250を超え、取得エビデンス価値は50です。主な価値が安心材料に留まり、必須
 > エビデンスでない場合、この測定は推奨しません。代替手段、延期、または計画縮小を検討してください。
 
 推奨action: `PREFER_ALTERNATIVE_OR_DEFER`

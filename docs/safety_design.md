@@ -6,13 +6,17 @@
 
 ## 基本原則
 
-**事故ゼロは不能という前提に立つ。**
+現行方針では、安全を責任の押し付け先ではなく、事故前に人員、装備、時間、停止・復旧能力を構成する
+engineering capabilityとして扱う。防げる条件は測定前に塞ぎ、残余riskとunknownを表示し、実行後の
+recoveryまで設計する。現行正本は
+[`architecture/prospective-meta-safety.md`](architecture/prospective-meta-safety.md)と
+[`architecture/measurement-plan-approval.md`](architecture/measurement-plan-approval.md)である。
 
-だから「事故を防ぐ」ではなく「事故った後まで設計する」。
+以下の「責任」中心記述は2026-06-21時点の初期思想記録で、現行の実装入力へ使用しない。
 
 ---
 
-## 責任の構造
+## 旧案: 責任の構造 `[SUPERSEDED]`
 
 ```
 ツール製作者（齋藤みつる）
@@ -147,7 +151,10 @@ SILとの直接対応表として使用しない。
 
 ---
 
-## ユーザー責任設定ファイル
+## 旧案: ユーザー責任設定ファイル `[SUPERSEDED]`
+
+次の署名ファイル案は、単一ユーザーへ安全を引き受けさせるため現行実装へ使用しない。
+現行はMeasurementPlan、Dev Check、Engineer Check、RiskCapacityRequest、ApprovalSessionを分離する。
 
 `config/safety_profile.json` にユーザーが署名して保存。
 
@@ -167,4 +174,4 @@ SILとの直接対応表として使用しない。
 }
 ```
 
-この設定ファイルが存在しない場合、ツールは起動しない。
+旧案ではこの設定ファイルが存在しない場合にツールを起動しない想定だった。現行ゲート契約ではない。
