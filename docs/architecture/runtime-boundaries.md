@@ -162,6 +162,25 @@ AUTO回数、optimizer反復数、settle時間等をproject定数としてhardco
 AIは探索点と観測窓を選べるが、各instrument／channelの電圧、common-mode、probe、GND、source、DUT、負荷を
 hard constraintとして扱う。目的関数の改善を理由に物理曝露範囲を越えない。
 
+各analog channelは独立した`ChannelExposureContract`を持つ。期待／最大のVrms、Vpeak、DC、offset、transient、
+probe倍率と定格、BNC到達値、coupling、impedance、V/div、測定点、reference nodeをchannel IDへ固定する。
+V/div不一致による`DISPLAY_RANGE_MISMATCH`と、probe／BNC／common-mode定格に対する
+`PHYSICAL_INPUT_LIMIT`を分離し、どちらもoptimizerのhard constraintにする。
+
+さらに全channelの`SharedReferenceContract`を検証する。channelごとのrangeが安全でも、earth referenceを共有する
+入力のground leadを異電位へ接続する組合せは許可しない。高電圧一次側、output transformer二次側、低電圧preampを
+nodeと絶縁境界ごとに分け、math差分を絶縁の代用品にしない。
+
+`SharedReferenceContract`の物理入力はエンジニアの`EngineerProbingDeclaration`から受け取る。scope内部共通GND、
+DUT／source／dummy load／保護接地、isolation transformerの位置、差動probeの定格、USB／LAN等の再接地pathを
+connection graphとして記録する。AIはgraph検証を行うが現物確認を代理しない。宣言不足時はAI起点writeだけを
+blockし、既存波形のread／解析は`UNKNOWN` provenance付きで継続する。
+
+承認UIでchannel range、probe ID／倍率、GND／reference graph、coupling、impedance、測定点の不一致をユーザーが
+rejectした場合、ネゴシエーション層は`REJECTED_FOR_REPLAN`へ移る。reject reasonとevidenceから新しいplan hashを
+作り直すまで、測定開始、AUTO、range、source等のwriteを許可しない。承認後のprobe／GND変更もbinding失効として
+同じloopへ戻し、旧承認を自動移植しない。
+
 異常検出後の挙動は`AnomalyContract`へ固定する。異常signal定義、判定窓、reason code、停止順序、保存対象、
 partial finalize、MCP handoff、定義外異常のfallbackを事前にユーザーが承認する。異常後はこのflow以外の新規
 測定・探索を拒否し、保存evidenceは次計画の入力にできるが旧ApprovalSessionは継承しない。
