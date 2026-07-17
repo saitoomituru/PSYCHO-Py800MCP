@@ -96,6 +96,8 @@ MeasurementBasisBundleへ正規化する。Dev、characterization、pre-complian
 - AIが起動する測定開始、垂直レンジ系変更、RUN/STOP、連続取得をApprovalSessionへ結合する
 - voltage、transient、frequency、probe、coupling、impedance、GND、DUT stateをbounded envelopeへ固定する
 - AI遠隔AUTOを複合状態変更として扱い、無信号時のrange探索停止、試行上限、前後snapshotを実装する
+- 複数channel／登録機材の利得・伝達特性optimizerを承認済みhard constraint内で実行する
+- 異常signal定義、停止順序、ログ退避、部分確定をAnomalyContractへ結合する
 - 時間軸等のdata-quality変更と、ADC保護に関わるvertical/input-path変更を別capabilityにする
 - 中断、期限切れ、切断、部分応答、再接続、状態復元を試験する
 - 証拠ログの改ざん検出と承認・操作の結合を強化する
@@ -194,10 +196,21 @@ Phase 2でenvelope、試行上限、before/after、rollback可否を実装する
 起動後に安全relayが接続されるまでDC spikeがあり得るDUTでは、電源OFF、relay開放中の起動過渡、relay接続、
 定常、停止過渡を別stateとして計画する。無信号の起動前stateを定常状態と誤認してAUTOを連鎖させない。
 
-Phase 2の限定周回は`scope取得停止 -> DUT再起動 -> settle -> 承認済みAUTO最大1回 -> envelope照合`を基本形に
-する。認可最大rangeでも成立しない場合は`RANGE_EXHAUSTED / INCONCLUSIVE`をwarningとして残し、追加探索を
+Phase 2の限定周回は`scope取得停止 -> DUT再起動 -> settle -> 承認済みAUTO -> envelope照合`を基本形にする。
+AUTO回数、反復数、settle時間はhardcodeせず、採用規格、社内SOP、機種能力、実験目的から計画ごとに導出し、
+ユーザーが承認する。認可最大rangeまたは承認済み試行上限でも成立しない場合は
+`RANGE_EXHAUSTED / INCONCLUSIVE`をwarningとして残し、追加探索を
 停止する。得られた設定snapshot、command log、部分波形、判定理由を確定し、許可された成果物をユーザー側へ
 handoffしてread-only解析へ移行する。縮退完了を測定成功へ読み替えない。
+
+複数channelの差分、比、位相、XY、利得、伝達特性と、Pairing Registry登録機材を使うloopは
+`OptimizationEnvelope`内で自動実行する。AIは目的関数に沿って探索点を選べるが、各channel、source、DUT、
+負荷、common-mode、GNDの承認済み物理範囲を越えない。毎点承認は要求せず、探索空間の境界と停止条件を
+先に承認する。
+
+異常signalの定義と退避flowも事前計画に含める。閾値、持続時間、判定confidence、停止順序、raw buffer、
+設定snapshot、command log、部分成果物、handoff、定義外異常のfallbackをユーザーが承認する。異常成立後は
+計画どおり停止・退避し、保存evidenceを次の測定計画へ渡すが、旧承認で測定を再開しない。
 
 ## 5. Season計画
 

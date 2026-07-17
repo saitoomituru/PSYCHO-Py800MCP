@@ -98,6 +98,8 @@ MeasurementPlanとStep承認が実装されるまでfail closedとする。
 | `INPUT_PATH_CHANGE` | 垂直感度、offset、倍率、結合、入力impedance、電流range | Dev Check＋Engineer Check＋plan承認が必要 |
 | `AI_REMOTE_AUTOSET` | AIがAUTO／Autosetを送信 | 複合状態変更。承認envelope、試行上限、前後snapshotが必要 |
 | `AUTOSET_PROPOSE` | 既存artifactから設定候補だけを計算 | 実機権限なし。候補は承認を生成しない |
+| `MULTICHANNEL_DERIVATION` | 複数CHの差分、比、位相、XY、利得 | 保存／承認済み取得data内なら自動実行可 |
+| `BOUNDED_OPTIMIZATION` | sourceと複数機材を使う利得・伝達特性探索 | 承認済みOptimizationEnvelope内だけ自動実行可 |
 | `REVERSIBLE_INSTRUMENT_STATE` | 表示・保存形式等、入力曝露を変えない設定 | baseline、変更、restore結果を記録 |
 | `INSTRUMENT_STORAGE_MUTATION` | 機器内file作成・読取・削除 | path、目的、結果、cleanupを記録 |
 | `DATA_EGRESS` | MCP hostへsummary／slice／artifactを返す | 宛先と範囲を明示。外部host契約へhandoff |
@@ -148,10 +150,21 @@ envelopeと照合する。`NOT_OBSERVED`または`UNKNOWN`から追加AUTOを連
 定常状態を分離し、各stateへ別の期待範囲とtimeoutを与える。scope STOP／arm、DUT再起動、relay接続を一つの
 曖昧な`start`へ束ねず、誰が何を操作するかを個別stepとして記録する。
 
-承認済み周回は`ACQUISITION_STOPPED -> DUT_RESTART_REQUESTED -> SETTLING -> AUTOSET_ONCE ->
+承認済み周回は`ACQUISITION_STOPPED -> DUT_RESTART_REQUESTED -> SETTLING -> AUTOSET_BOUNDED ->
 ENVELOPE_VALIDATION`を上限付きで実行できる。認可最大rangeでも成立しなければ`RANGE_EXHAUSTED`として
 追加操作を止め、partial artifact、状態snapshot、command log、判定理由を確定する。その後は許可された成果物を
 MCP hostへhandoffして`READ_ONLY_HANDOFF`へ移り、計画修正と再承認まで実機writeを受け付けない。
+
+AUTO回数、optimizer反復数、settle時間等をproject定数としてhardcodeしない。MeasurementBasisBundle、社内SOP、
+機種能力、実験目的から導出された値と根拠をplanへ入れ、ユーザーがenvelopeの一部として承認する。
+
+複数channel演算と複数登録機材による利得・伝達特性探索は、`OptimizationEnvelope`内で自動実行できる。
+AIは探索点と観測窓を選べるが、各instrument／channelの電圧、common-mode、probe、GND、source、DUT、負荷を
+hard constraintとして扱う。目的関数の改善を理由に物理曝露範囲を越えない。
+
+異常検出後の挙動は`AnomalyContract`へ固定する。異常signal定義、判定窓、reason code、停止順序、保存対象、
+partial finalize、MCP handoff、定義外異常のfallbackを事前にユーザーが承認する。異常後はこのflow以外の新規
+測定・探索を拒否し、保存evidenceは次計画の入力にできるが旧ApprovalSessionは継承しない。
 
 ## ObservationContext
 
