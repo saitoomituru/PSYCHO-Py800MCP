@@ -238,6 +238,11 @@ scope外とし、ユーザー提供の決裁資料がある場合も係数へ混
 音声合成を任意の派生出力とする。文面は自由生成だけに任せず、score band、evidence necessity、unknown、
 不足checkからversion付きtemplateで選ぶ。音声層は実機権限を持たず、状態変化時だけrate-limitして読む。
 
+Dashboardは、青／黄／赤／灰黒のproject-localな産業ステータス核と、交換可能なSF themeへ分離する。
+色状態は`operation_id + snapshot_id`へ付与し、person IDへ付与しない。黄は追加確認員のstaffing request、
+赤は停止権限・復旧・incident handling能力を持つ体制の配備要求へ変換する。詳細は
+[`architecture/industrial-sf-status-layer.md`](architecture/industrial-sf-status-layer.md)を参照。
+
 承認済み計画は規格アップグレードで黙って変更しない。新版を検出した場合は、ユーザーへ新版原本または
 更新要求項目の投入を依頼し、新しいSourceBundle、数理環境、plan hashを作って再承認を要求する。
 GUI中止後は新規操作を止め、事前承認済みの

@@ -121,6 +121,15 @@ Engineer viewへdrill-downできるようにする。
 
 ## 7. 音声合成
 
+### status lamp音声例
+
+- blue: 「現場状態は青。観測・記録支援中です。物理状態の変更はありません」
+- yellow: 「現場状態は黄。追加確認員を要請してください。対象作業のcheckが不足しています」
+- red: 「現場状態は赤。停止権限と復旧対応能力を持つ体制が揃うまで、執行を開始しません」
+- gray-black: 「現場状態は不明。判定材料が不足しています。新規執行はblockされています」
+
+音声は個人名を危険係数と結び付けず、operationと必要な組織能力を読む。
+
 - 画面表示文を正本とし、TTS専用の別判断を作らない
 - mode、band、unknown、必要人員、推奨actionの変化時だけ自動読上げ候補にする
 - 同一message IDをdeduplicateし、rate limitとquiet timeを持つ
